@@ -17,4 +17,4 @@ run: $(BIN)
 	$(QEMU) -drive format=raw,file=$(BIN)
 
 clean:
-	rm -f $(BIN)
+	rm -rf $(BIN_DIR)
