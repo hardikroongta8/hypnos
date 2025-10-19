@@ -7,10 +7,14 @@ mov bx, HELLO
 call print
 call println
 
-loop:
-	jmp loop
+mov dx, 0x69AF
+call printhex
+call println
+
+jmp $
 
 %include "print.asm"
+%include "printhex.asm"
 
 times 510 - ($-$$) db 0
 dw 0xaa55
