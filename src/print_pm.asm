@@ -1,7 +1,7 @@
 [bits 32]
 
 VIDEO_MEMORY equ 0xb8000
-WHITE_ON_BLACK equ 0x0f
+MAGENTA_ON_BLACK equ 0x0d
 
 print_pm:
 	pusha
@@ -9,7 +9,7 @@ print_pm:
 
 print_pm_loop:
 	mov al, [ebx] ; ebx must contain the pointer to the string 
-	mov ah, WHITE_ON_BLACK
+	mov ah, MAGENTA_ON_BLACK
 
 	cmp al, 0
 	je print_pm_done
