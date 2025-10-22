@@ -14,18 +14,18 @@ OBJ       = $(C_SOURCES:.c=.o)
 CC  = i386-elf-gcc
 GDB = i386-elf-gdb
 LD  = i386-elf-ld
-CFLAGS = -g
+CFLAGS = -g -ffreestanding -O2 -Wall -Wextra
 
 INCLUDES = $(wildcard $(BOOT_DIR)/*.asm)
 
 ASM       = nasm
 ASM_FLAGS = -f bin -I $(BOOT_DIR)
-QEMU      = qemu-system-x86_64
+QEMU      = qemu-system-i386
 
 all: $(OS_IMAGE_BIN)
 
 run: $(OS_IMAGE_BIN)
-	$(QEMU) -drive format=raw,file=$(OS_IMAGE_BIN),if=floppy
+	$(QEMU) -drive format=raw,file=$<,if=floppy
 
 $(OS_IMAGE_BIN): $(BOOT_BIN) $(KERNEL_BIN)
 	cat $^ > $@
@@ -47,5 +47,4 @@ $(KERNEL_BIN): $(BOOT_DIR)/kernel_entry.o $(OBJ)
 
 clean:
 	rm -rf $(BIN_DIR)
-	rm $(BOOT_DIR)/*.o
-	rm $(OBJ)
+	rm -f $(BOOT_DIR)/*.o $(OBJ)
