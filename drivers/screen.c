@@ -21,7 +21,7 @@ void kprint(char *s) {
 void kprintln(char *s) {
   kprint(s);
   int curr_offset = get_cursor_offset();
-  int row = get_row_from_offset(curr_offset);
+  int row         = get_row_from_offset(curr_offset);
   set_cursor_offset(get_offset(0, row + 1));
 }
 
@@ -33,8 +33,8 @@ void clear_screen() {
 }
 
 void print_char_at_offset(char c, int offset, char attribute) {
-  char *vga = (char *)VGA_ADDRESS;
-  vga[offset] = c;
+  char *vga       = (char *)VGA_ADDRESS;
+  vga[offset]     = c;
   vga[offset + 1] = attribute;
   set_cursor_offset(offset + 2);
 }
