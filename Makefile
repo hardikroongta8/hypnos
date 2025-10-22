@@ -5,6 +5,7 @@ KERNEL_ENTRY = $(BOOT_DIR)/kernel_entry.asm
 BIN_DIR      = bin
 BOOT_BIN     = $(BIN_DIR)/boot.bin
 KERNEL_BIN   = $(BIN_DIR)/kernel.bin
+KERNEL_ELF   = $(BIN_DIR)/kernel.elf
 OS_IMAGE_BIN = $(BIN_DIR)/os-image.bin
 
 C_SOURCES = $(wildcard kernel/*.c drivers/*.c)
@@ -27,6 +28,10 @@ all: $(OS_IMAGE_BIN)
 run: $(OS_IMAGE_BIN)
 	$(QEMU) -drive format=raw,file=$<,if=floppy
 
+debug: $(OS_IMAGE_BIN) $(KERNEL_ELF)
+	$(QEMU) -s -drive format=raw,file=$(OS_IMAGE_BIN),if=floppy &
+	$(GDB) -ex "target remote localhost:1234" -ex "symbol-file $(KERNEL_ELF)"
+
 $(OS_IMAGE_BIN): $(BOOT_BIN) $(KERNEL_BIN)
 	cat $^ > $@
 
@@ -38,6 +43,9 @@ $(BOOT_BIN): $(BOOT_ENTRY) $(INCLUDES) | $(BIN_DIR)
 
 $(KERNEL_BIN): $(BOOT_DIR)/kernel_entry.o $(OBJ)
 	$(LD) -o $@ -Ttext 0x1000 $^ --oformat binary
+
+$(KERNEL_ELF): $(BOOT_DIR)/kernel_entry.o $(OBJ)
+	$(LD) -o $@ -Ttext 0x1000 $^
 
 %.o: %.c ${HEADERS}
 	${CC} ${CFLAGS} -ffreestanding -c $< -o $@
