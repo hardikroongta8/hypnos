@@ -1,3 +1,4 @@
+[bits 16]
 printhex:
 	pusha
 	mov cx, 0

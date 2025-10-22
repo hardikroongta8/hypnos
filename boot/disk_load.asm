@@ -1,8 +1,12 @@
-disk_load: ; set the starting sector to read in the cl register
+[bits 16]
+; set the starting sector to read in the cl register
+; set the buffer address in the bx register (ES:BX is used for buffer pointer)
+disk_load:
 	pusha
 
-	push dx    ; push the values in the stack so the register can be used
-	mov al, dh ; number of sectors to read (comes from params)
+	push dx      ; push the values in the stack so the register can be used
+	mov al, dh   ; number of sectors to read (comes from params)
+	mov cl, 0x02 ; starting sector
 
 	mov ah, 0x02 ; set ah = 0x02 for calling the interrupt
 	mov ch, 0x00 ; cylinder number

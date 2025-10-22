@@ -1,25 +1,51 @@
-SRC_DIR = src
-BIN_DIR = bin
-SRC = $(SRC_DIR)/boot.asm
-BIN = $(BIN_DIR)/boot.bin
+BOOT_DIR     = boot
+BOOT_ENTRY   = $(BOOT_DIR)/boot.asm
+KERNEL_ENTRY = $(BOOT_DIR)/kernel_entry.asm
 
-INCLUDES = $(wildcard $(SRC_DIR)/*.asm)
+BIN_DIR      = bin
+BOOT_BIN     = $(BIN_DIR)/boot.bin
+KERNEL_BIN   = $(BIN_DIR)/kernel.bin
+OS_IMAGE_BIN = $(BIN_DIR)/os-image.bin
 
-ASM = nasm
-ASM_FLAGS = -f bin -I $(SRC_DIR)
+C_SOURCES = $(wildcard kernel/*.c drivers/*.c)
+HEADERS   = $(wildcard kernel/*h drivers/*.h)
+OBJ       = $(C_SOURCES:.c=.o)
 
-QEMU = qemu-system-x86_64
+CC  = i386-elf-gcc
+GDB = i386-elf-gdb
+LD  = i386-elf-ld
+CFLAGS = -g
 
-all: $(BIN)
+INCLUDES = $(wildcard $(BOOT_DIR)/*.asm)
+
+ASM       = nasm
+ASM_FLAGS = -f bin -I $(BOOT_DIR)
+QEMU      = qemu-system-x86_64
+
+all: $(OS_IMAGE_BIN)
+
+run: $(OS_IMAGE_BIN)
+	$(QEMU) -drive format=raw,file=$(OS_IMAGE_BIN),if=floppy
+
+$(OS_IMAGE_BIN): $(BOOT_BIN) $(KERNEL_BIN)
+	cat $^ > $@
 
 $(BIN_DIR): 
 	mkdir -p $(BIN_DIR)
 
-$(BIN): $(SRC) $(INCLUDES) | $(BIN_DIR)
+$(BOOT_BIN): $(BOOT_ENTRY) $(INCLUDES) | $(BIN_DIR)
 	$(ASM) $(ASM_FLAGS) $< -o $@
 
-run: $(BIN)
-	$(QEMU) -drive format=raw,file=$(BIN)
+$(KERNEL_BIN): $(BOOT_DIR)/kernel_entry.o $(OBJ)
+	$(LD) -o $@ -Ttext 0x1000 $^ --oformat binary
+
+%.o: %.c ${HEADERS}
+	${CC} ${CFLAGS} -ffreestanding -c $< -o $@
+
+%.o: %.asm
+	$(ASM) $< -f elf -o $@
 
 clean:
 	rm -rf $(BIN_DIR)
+	rm $(BOOT_DIR)/*.o
+	rm $(OBJ)
