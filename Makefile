@@ -1,3 +1,5 @@
+.PHONY: all run debug clean
+
 BOOT_DIR     = boot
 BOOT_ENTRY   = $(BOOT_DIR)/boot.asm
 KERNEL_ENTRY = $(BOOT_DIR)/kernel_entry.asm
@@ -15,7 +17,7 @@ OBJ       = $(C_SOURCES:.c=.o)
 CC  = i386-elf-gcc
 GDB = i386-elf-gdb
 LD  = i386-elf-ld
-CFLAGS = -g -ffreestanding -O1 -Wall -Wextra
+CFLAGS = -g -ffreestanding -O2 -Wall -Wextra
 
 INCLUDES = $(wildcard $(BOOT_DIR)/*.asm)
 
@@ -48,7 +50,7 @@ $(KERNEL_ELF): $(BOOT_DIR)/kernel_entry.o $(OBJ)
 	$(LD) -o $@ -Ttext 0x1000 $^
 
 %.o: %.c ${HEADERS}
-	${CC} ${CFLAGS} -ffreestanding -c $< -o $@
+	${CC} ${CFLAGS} -c $< -o $@
 
 %.o: %.asm
 	$(ASM) $< -f elf -o $@

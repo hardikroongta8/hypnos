@@ -35,12 +35,12 @@ void clear_screen() {
 }
 
 void print_char(char c, int offset, char attribute) {
-  char *vga       = (char *)VGA_ADDRESS;
-  vga[offset]     = c;
-  vga[offset + 1] = attribute;
+  volatile char *vga = (volatile char *)VGA_ADDRESS;
+  vga[offset]        = c;
+  vga[offset + 1]    = attribute;
 }
 
-int get_cursor_offset() {
+__attribute__((noinline)) int get_cursor_offset() {
   /* Request for higher byte of the cursor position (14) */
   port_write_byte(VGA_CTRL_REGISTER, 14);
   int pos = port_read_byte(VGA_DATA_REGISTER) << 8;
@@ -51,7 +51,7 @@ int get_cursor_offset() {
   return 2 * (pos + port_read_byte(VGA_DATA_REGISTER));
 }
 
-void set_cursor_offset(int offset) {
+__attribute__((noinline)) void set_cursor_offset(int offset) {
   offset /= 2;
   port_write_byte(VGA_CTRL_REGISTER, 15);
   port_write_byte(VGA_DATA_REGISTER, offset & 0xff);

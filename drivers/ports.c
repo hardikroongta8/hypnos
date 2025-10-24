@@ -6,7 +6,7 @@ unsigned char port_read_byte(unsigned short port) {
    * Put the output in the 'eax' register
    * Set 'result' to the value present in 'eax' register
    */
-  __asm__("in %%dx, %%al" : "=a"(result) : "d"(port));
+  __asm__ volatile("inb %1, %0" : "=a"(result) : "Nd"(port) : "memory");
   return result;
 }
 
@@ -16,7 +16,7 @@ void port_write_byte(unsigned short port, unsigned char data) {
    * Put 'data' in 'eax' register
    * Run the instruction
    */
-  __asm__("out %%al, %%dx" : : "d"(port), "a"(data));
+  __asm__ volatile("outb %1, %0" : : "Nd"(port), "a"(data) : "memory");
 }
 
 unsigned short port_read_word(unsigned short port) {
@@ -27,7 +27,7 @@ unsigned short port_read_word(unsigned short port) {
    * Put the output in the 'eax' register
    * Set 'result' to the value present in 'eax' register
    */
-  __asm__("in %%dx, %%ax" : "=a"(result) : "d"(port));
+  __asm__ volatile("inw %1, %0" : "=a"(result) : "Nd"(port) : "memory");
   return result;
 }
 
@@ -37,5 +37,5 @@ void port_write_word(unsigned short port, unsigned short data) {
    * Put 'data' in 'eax' register
    * Run the instruction
    */
-  __asm__("out %%ax, %%dx" : : "d"(port), "a"(data));
+  __asm__ volatile("outw %1, %0" : : "Nd"(port), "a"(data) : "memory");
 }
