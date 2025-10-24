@@ -31,7 +31,7 @@ run: $(OS_IMAGE_BIN)
 	$(QEMU) -drive format=raw,file=$<,if=floppy
 
 debug: $(OS_IMAGE_BIN) $(KERNEL_ELF)
-	$(QEMU) -s -drive format=raw,file=$(OS_IMAGE_BIN),if=floppy &
+	$(QEMU) -s -S -drive format=raw,file=$<,if=floppy &
 	$(GDB) -ex "target remote localhost:1234" -ex "symbol-file $(KERNEL_ELF)"
 
 $(OS_IMAGE_BIN): $(BOOT_BIN) $(KERNEL_BIN)
