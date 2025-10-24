@@ -15,7 +15,7 @@ OBJ       = $(C_SOURCES:.c=.o)
 CC  = i386-elf-gcc
 GDB = i386-elf-gdb
 LD  = i386-elf-ld
-CFLAGS = -g -ffreestanding -O2 -Wall -Wextra
+CFLAGS = -g -ffreestanding -O1 -Wall -Wextra
 
 INCLUDES = $(wildcard $(BOOT_DIR)/*.asm)
 

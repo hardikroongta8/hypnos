@@ -1,7 +1,7 @@
 #include "screen.h"
 #include "ports.h"
 
-void print_char_at_offset(char, int, char);
+void print_char(char, int, char);
 void set_cursor_offset(int);
 
 int get_cursor_offset();
@@ -10,12 +10,14 @@ int get_row_from_offset(int);
 int get_col_from_offset(int);
 
 void kprint(char *s) {
-  int i = 0;
+  int i      = 0;
+  int offset = get_cursor_offset();
   while (s[i] != '\0') {
-    int curr_offset = get_cursor_offset();
-    print_char_at_offset(s[i], curr_offset, GREEN_ON_BLACK);
+    print_char(s[i], offset, GREEN_ON_BLACK);
+    offset += 2;
     i++;
   }
+  set_cursor_offset(offset);
 }
 
 void kprintln(char *s) {
@@ -27,16 +29,15 @@ void kprintln(char *s) {
 
 void clear_screen() {
   for (int offset = 0; offset < get_offset(MAX_COLS, MAX_ROWS); offset += 2) {
-    print_char_at_offset(' ', offset, GREEN_ON_BLACK);
+    print_char(' ', offset, GREEN_ON_BLACK);
   }
   set_cursor_offset(0);
 }
 
-void print_char_at_offset(char c, int offset, char attribute) {
+void print_char(char c, int offset, char attribute) {
   char *vga       = (char *)VGA_ADDRESS;
   vga[offset]     = c;
   vga[offset + 1] = attribute;
-  set_cursor_offset(offset + 2);
 }
 
 int get_cursor_offset() {
