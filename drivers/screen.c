@@ -1,5 +1,6 @@
 #include "screen.h"
 #include "ports.h"
+#include "../kernel/util.h"
 
 void print_char(char, int, char);
 void set_cursor_offset(int);
@@ -10,8 +11,23 @@ int get_row_from_offset(int);
 int get_col_from_offset(int);
 
 void kprint(char *s) {
-  int i      = 0;
-  int offset = get_cursor_offset();
+  char *vga = (char *)VGA_ADDRESS;
+
+  int max_offset = 2 * (MAX_COLS * MAX_ROWS) - 1;
+  int offset     = get_cursor_offset();
+
+  if (offset > max_offset) {
+    for (int r = 0; r < MAX_ROWS - 1; r++) {
+      memory_copy(vga + get_offset(0, r + 1), vga + get_offset(0, r), 2 * MAX_COLS);
+    }
+    for (int c = 0; c < MAX_COLS; c++) {
+      print_char(' ', get_offset(c, MAX_ROWS - 1), GREEN_ON_BLACK);
+    }
+    offset = offset - 2 * MAX_COLS;
+  }
+
+  int i = 0;
+
   while (s[i] != '\0') {
     print_char(s[i], offset, GREEN_ON_BLACK);
     offset += 2;
